@@ -229,15 +229,15 @@ const demoText = `今儿咱说个事儿
 你第一个认出来的是谁
 评论区聊聊`;
 
-const searchCount = 40;
+const searchCount = 8;
 const batchSize = 4;
 
 const phraseQueries = {
   说个事: ["说话 口播 人物", "人物 讲述"],
   说话: ["说话 口播 人物", "人物 讲话"],
-  丢人: ["不好意思 尴尬 表情", "丢人 表情"],
-  不好意思: ["不好意思 尴尬 表情", "害羞 尴尬"],
-  解气: ["解气 表情", "痛快 表情"],
+  丢人: ["真人 尴尬 影视剧照", "不好意思 人物"],
+  不好意思: ["真人 尴尬 影视剧照", "人物 害羞 尴尬"],
+  解气: ["真人 解气 影视剧照", "痛快 人物"],
   展厅: ["艺术展厅", "展厅 看画"],
   每一笔: ["毛笔 写字 特写", "书法 笔锋"],
   杀气: ["水墨 杀气 笔锋", "凌厉 书法 笔锋"],
@@ -252,11 +252,11 @@ const phraseQueries = {
   古代: ["中国古代 人物", "古代街道"],
   走出城: ["古代城门 出城", "走出城门"],
   古代喝酒: ["古代喝酒", "古人 酒馆 喝酒"],
-  喝醉: ["喝醉 表情", "醉酒 人物"],
+  喝醉: ["真人 喝醉 影视剧照", "醉酒 人物"],
   老虎: ["老虎", "猛虎 特写"],
   茶: ["一杯茶", "茶杯 热茶"],
   外国人: ["外国人 人物", "外国人 看展"],
-  语塞: ["语塞 表情", "答不上来 表情"],
+  语塞: ["真人 语塞 影视剧照", "答不上来 人物"],
   一幅画: ["一幅画 展厅", "墙上挂画"],
   拳头上茧: ["拳头 老茧 特写", "手上老茧"],
   宋江带刀: ["宋江 带刀", "水浒 宋江 佩刀"],
@@ -291,7 +291,7 @@ const phraseQueries = {
   背面: ["卡片背面", "问答卡片 背面"],
   问答: ["问答卡片", "人物小传 卡片"],
   饭桌: ["饭桌 聊天", "餐桌 交谈"],
-  长脸: ["有面子 表情", "自信 表情"],
+  长脸: ["人物 自信 有面子", "成功 人物"],
   等车: ["等车 看卡片", "公交站 阅读"],
   睡前: ["睡前 阅读", "孩子 睡前看书"],
   碎片时间: ["碎片时间 阅读", "通勤 阅读"],
@@ -392,8 +392,8 @@ const visualRules = [
   [/鲁智深.*拳头.*茧|拳头.*茧/, ["拳头上茧", "鲁智深 拳头"]],
   [/林冲.*眉头.*雪|眉头.*雪/, ["林冲 雪", "林冲"]],
   [/今儿咱说|咱说|说个事/, ["说话 口播 人物", "人物 讲述"]],
-  [/丢人|不好意思|尴尬/, ["不好意思 尴尬 表情", "丢人 表情"]],
-  [/解气|痛快|出气/, ["解气 表情", "痛快 表情"]],
+  [/丢人|不好意思|尴尬/, ["真人 尴尬 影视剧照", "不好意思 人物"]],
+  [/解气|痛快|出气/, ["真人 解气 影视剧照", "痛快 人物"]],
   [/东亚文化展/, ["东亚文化展 展厅", "文化展览"]],
   [/布拉格/, ["布拉格", "布拉格 展览"]],
   [/展厅/, ["艺术展厅", "展厅 看画"]],
@@ -406,7 +406,7 @@ const visualRules = [
   [/指着.*画|画说/, ["指着一幅画", "墙上挂画"]],
   [/风雪山神庙|雪山神庙/, ["雪山神庙", "风雪山神庙"]],
   [/酒葫芦/, ["酒葫芦", "林冲 酒葫芦"]],
-  [/愣住|答不上来|语塞|不说话/, ["语塞 表情", "愣住 表情"]],
+  [/愣住|答不上来|语塞|不说话/, ["真人 语塞 影视剧照", "愣住 人物"]],
   [/拔刀|刀前/, ["古代人物 拔刀", "人物带刀"]],
   [/鲁智深/, ["鲁智深", "鲁智深 水浒传 剧照"]],
   [/林冲/, ["林冲", "林冲 水浒传 剧照"]],
@@ -415,7 +415,7 @@ const visualRules = [
   [/古代.*规矩|杀人偿命|古代/, ["中国古代 人物", "古代街道"]],
   [/走出城|出城/, ["古代城门 出城", "走出城门"]],
   [/十八碗酒|下肚/, ["古代喝酒", "武松 十八碗酒"]],
-  [/醉/, ["喝醉 表情", "醉酒 人物"]],
+  [/醉/, ["真人 喝醉 影视剧照", "醉酒 人物"]],
   [/老虎/, ["老虎", "猛虎 特写"]],
   [/茶.*凉|茶/, ["一杯茶", "茶杯 热茶"]],
   [/外国人/, ["外国人 人物", "外国人 看展"]],
@@ -424,8 +424,8 @@ const visualRules = [
   [/皱纹/, ["老人 皱纹 特写", "脸上皱纹"]],
   [/前世今生|命运/, ["人物命运", "人物小传"]],
   [/站起来|活过来|活过来的/, ["水墨人物 站起来", "人物画"]],
-  [/心寒|扎心|不甘心|后背一麻/, ["震惊 表情", "人物 心寒"]],
-  [/摇头/, ["人物 摇头", "摇头 表情"]],
+  [/心寒|扎心|不甘心|后背一麻/, ["真人 震惊 影视剧照", "人物 心寒"]],
+  [/摇头/, ["人物 摇头", "摇头 真人"]],
   [/孩子|儿童/, ["孩子 阅读", "儿童 名著启蒙"]],
   [/失明|看不见|右眼/, ["老人 右眼失明", "失明 老人"]],
   [/失聪|听不见|双耳/, ["老人 失聪", "老人 听不见"]],
@@ -434,7 +434,7 @@ const visualRules = [
   [/画室|不足五平米|没空调/, ["中国画家 画室", "老画家 画室"]],
   [/戴老|戴敦邦/, ["戴敦邦 老画家", "戴敦邦 人物画"]],
   [/娘子|温过|酒还温着/, ["古代 温酒", "古代夫妻"]],
-  [/绝路/, ["古代人物 绝路", "绝望 表情"]],
+  [/绝路/, ["古代人物 绝路", "绝望 人物"]],
   [/剧组|开拍/, ["电视剧剧组", "古装剧 剧组"]],
   [/演员|按图挑/, ["古装演员 剧照", "演员 试装"]],
   [/服装|化妆|造型/, ["古装 服装 化妆", "水浒传 服装 造型"]],
@@ -453,7 +453,7 @@ const visualRules = [
   [/正面|背面|问答式|人物小传/, ["人物卡 正面 背面", "问答卡片"]],
   [/饭桌|聊半天/, ["饭桌 聊天", "餐桌 交谈"]],
   [/附庸风雅|真懂|分量/, ["中国画 鉴赏", "看画 交流"]],
-  [/长脸|有面子/, ["有面子 表情", "自信 表情"]],
+  [/长脸|有面子/, ["人物 自信 有面子", "成功 人物"]],
   [/等车|睡前|碎片时间/, ["碎片时间 阅读", "孩子 睡前看书"]],
   [/文化血脉|传统文化/, ["中国传统文化", "传统文化 孩子"]],
   [/加厚|圆角|切边|不伤手/, ["厚纸圆角卡片", "圆角卡片"]],
@@ -566,7 +566,7 @@ function buildQueries(segment, terms, lastQuery) {
 }
 
 function fallbackQuery(segment) {
-  if (/丢人|解气|愣住|心寒|扎心|不甘心|后背一麻|答不上来/.test(segment)) return "人物 表情";
+  if (/丢人|解气|愣住|心寒|扎心|不甘心|后背一麻|答不上来/.test(segment)) return "真人 影视 情绪 特写";
   if (/孩子|女儿|儿童/.test(segment)) return "孩子 阅读 四大名著";
   if (/外国人|教授|展厅/.test(segment)) return "外国人 展厅 看中国画";
   if (/画|水墨|笔墨/.test(segment)) return "中国水墨人物画";
@@ -700,14 +700,14 @@ function renderTaskBody(task, index) {
   return `
     <div class="result-body">
       <div class="image-grid">
-        ${task.items.map((item) => renderImageCard(item)).join("")}
+        ${task.items.map((item, itemIndex) => renderImageCard(item, index, itemIndex)).join("")}
       </div>
       <button class="button button-light load-more" data-more="${index}">${task.loading ? "正在加载..." : "加载更多图片"}</button>
     </div>
   `;
 }
 
-function renderImageCard(item) {
+function renderImageCard(item, taskIndex, itemIndex) {
   return `
     <article class="image-card">
       <img src="${item.thumb}" alt="${escapeHtml(item.title)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.image-card').remove()" />
@@ -715,7 +715,7 @@ function renderImageCard(item) {
         <strong class="image-title">${escapeHtml(item.title || "图片结果")}</strong>
         <span class="image-meta">${escapeHtml(item.source || "图片搜索")}</span>
         <div class="image-actions">
-          <button class="button button-primary" data-add="${escapeHtml(item.id)}">添加</button>
+          <button class="button button-primary" data-add-task="${taskIndex}" data-add-item="${itemIndex}">添加</button>
           <a class="button button-light" href="${item.page || item.image}" target="_blank" rel="noreferrer">来源</a>
         </div>
       </div>
@@ -763,24 +763,43 @@ function addManualTask() {
   searchTask(task);
 }
 
-function findItem(id) {
-  for (const [index, task] of state.tasks.entries()) {
-    const item = task.items.find((candidate) => candidate.id === id);
-    if (item) return { ...item, taskId: task.id, order: task.order || index + 1, query: task.query, segment: task.segment };
-  }
-  return null;
+function findItem(taskIndex, itemIndex) {
+  const task = state.tasks[taskIndex];
+  const item = task?.items[itemIndex];
+  if (!task || !item) return null;
+  const itemKey = item.image || item.thumb || `${task.id}-${itemIndex}`;
+  return {
+    ...item,
+    itemKey,
+    taskId: task.id,
+    order: task.order || taskIndex + 1,
+    query: task.query,
+    segment: task.segment,
+  };
 }
 
-function addToBasket(id) {
-  const item = findItem(id);
-  if (!item || state.basket.some((saved) => saved.id === id)) return;
+function addToBasket(taskIndex, itemIndex) {
+  const item = findItem(taskIndex, itemIndex);
+  if (!item) return;
+  const exists = state.basket.some((saved) => saved.taskId === item.taskId && saved.itemKey === item.itemKey);
+  if (exists) {
+    showToast("这张图已经添加过。");
+    return;
+  }
   state.basket.push({ ...item, selectedAt: ++state.pickSeq });
   renderBasket();
   showToast("已添加到素材篮。");
 }
 
 function orderedBasketItems() {
-  return [...state.basket].sort((a, b) => (a.order - b.order) || (a.selectedAt - b.selectedAt));
+  const slotByTask = {};
+  return [...state.basket]
+    .sort((a, b) => (a.order - b.order) || (a.selectedAt - b.selectedAt))
+    .map((item) => {
+      const key = item.taskId || item.order || "M";
+      slotByTask[key] = (slotByTask[key] || 0) + 1;
+      return { ...item, slot: slotByTask[key] };
+    });
 }
 
 function autoPickFirstImages() {
@@ -789,6 +808,7 @@ function autoPickFirstImages() {
     if (!task.items.length || state.basket.some((item) => item.taskId === task.id)) return;
     state.basket.push({
       ...task.items[0],
+      itemKey: task.items[0].image || task.items[0].thumb || `${task.id}-0`,
       taskId: task.id,
       order: task.order || index + 1,
       query: task.query,
@@ -810,9 +830,9 @@ function renderBasket() {
         <article class="basket-item">
           <img src="${item.thumb}" alt="${escapeHtml(item.title)}" referrerpolicy="no-referrer" />
           <div class="basket-copy">
-            <strong>${String(index + 1).padStart(3, "0")} ${escapeHtml(item.taskId || "")} ${escapeHtml(item.title || "图片结果")}</strong>
+            <strong>${String(index + 1).padStart(3, "0")} ${escapeHtml(item.taskId || "")}-${item.slot} ${escapeHtml(item.title || "图片结果")}</strong>
             <span>${escapeHtml(item.query)} · ${escapeHtml(item.source)}</span>
-            <button class="remove-button" data-delete="${escapeHtml(item.id)}">移除</button>
+            <button class="remove-button" data-delete="${escapeHtml(`${item.taskId}-${item.selectedAt}`)}">移除</button>
           </div>
         </article>
       `,
@@ -902,19 +922,19 @@ els.manualInput.addEventListener("keydown", (event) => {
 });
 els.resultList.addEventListener("click", (event) => {
   const toggleIndex = event.target.closest("[data-toggle]")?.dataset.toggle;
-  const addId = event.target.dataset.add;
+  const addButton = event.target.closest("[data-add-task][data-add-item]");
   const moreIndex = event.target.dataset.more;
   const queryIndex = event.target.dataset.queryIndex;
 
   if (toggleIndex !== undefined) toggleTask(Number(toggleIndex));
   if (queryIndex !== undefined) setTaskQuery(Number(queryIndex), event.target.dataset.query);
-  if (addId) addToBasket(addId);
+  if (addButton) addToBasket(Number(addButton.dataset.addTask), Number(addButton.dataset.addItem));
   if (moreIndex !== undefined) searchTask(state.tasks[Number(moreIndex)], true);
 });
 els.basketList.addEventListener("click", (event) => {
   const id = event.target.dataset.delete;
   if (!id) return;
-  state.basket = state.basket.filter((item) => item.id !== id);
+  state.basket = state.basket.filter((item) => `${item.taskId}-${item.selectedAt}` !== id);
   renderBasket();
 });
 els.autoPickButton.addEventListener("click", autoPickFirstImages);

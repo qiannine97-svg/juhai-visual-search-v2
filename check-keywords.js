@@ -4,7 +4,7 @@ const vm = require("vm");
 const assert = require("assert");
 
 const appPath = path.join(__dirname, "app.js");
-const appCode = `${fs.readFileSync(appPath, "utf8")}\nthis.__buildTasks = buildTasks;`;
+const appCode = `${fs.readFileSync(appPath, "utf8")}\nthis.__buildTasks = buildTasks; this.__state = state; this.__addToBasket = addToBasket; this.__orderedBasketItems = orderedBasketItems;`;
 
 const fakeElement = {
   value: "",
@@ -69,8 +69,8 @@ const queries = tasks.map((task) => task.query);
 assert.strictEqual(tasks.length, sample.split("\n").length, "应该每一行生成一个搜索任务");
 [
   "说话 口播 人物",
-  "不好意思 尴尬 表情",
-  "解气 表情",
+  "真人 尴尬 影视剧照",
+  "真人 解气 影视剧照",
   "布拉格 东亚文化展",
   "展厅 水浒人物长卷",
   "水墨 宣纸",
@@ -81,7 +81,7 @@ assert.strictEqual(tasks.length, sample.split("\n").length, "应该每一行生�
   "雪山神庙",
   "林冲 陆谦",
   "酒葫芦",
-  "语塞 表情",
+  "真人 语塞 影视剧照",
   "古代人物 拔刀",
   "鲁智深",
   "三拳打死镇关西",
@@ -89,7 +89,7 @@ assert.strictEqual(tasks.length, sample.split("\n").length, "应该每一行生�
   "古代城门 出城",
   "武松",
   "古代喝酒",
-  "喝醉 表情",
+  "真人 喝醉 影视剧照",
   "老虎",
   "一杯茶",
   "外国人 人物",
@@ -98,5 +98,30 @@ assert.strictEqual(tasks.length, sample.split("\n").length, "应该每一行生�
   "拳头上茧",
   "宋江带刀",
 ].forEach((expected) => assert(queries.includes(expected), `缺少关键词：${expected}`));
+
+context.__state.tasks = [
+  {
+    id: "S01",
+    order: 1,
+    segment: "第一段",
+    query: "测试",
+    items: [
+      { id: "same-id", title: "第一张", source: "测试", thumb: "https://example.com/1-thumb.jpg", image: "https://example.com/1.jpg" },
+      { id: "same-id", title: "第二张", source: "测试", thumb: "https://example.com/2-thumb.jpg", image: "https://example.com/2.jpg" },
+    ],
+  },
+];
+context.__state.basket = [];
+context.__state.pickSeq = 0;
+context.__addToBasket(0, 0);
+context.__addToBasket(0, 1);
+
+assert.strictEqual(context.__state.basket.length, 2, "同一段应该可以连续添加两张不同图片");
+const orderedLabels = Array.from(context.__orderedBasketItems().map((item) => `${item.taskId}-${item.slot}`));
+assert.deepStrictEqual(
+  orderedLabels,
+  ["S01-1", "S01-2"],
+  "素材篮应保留段内选择顺序",
+);
 
 console.log(`关键词自检通过：${tasks.length} 行，${new Set(queries).size} 个首选搜索词。`);

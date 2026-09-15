@@ -22,6 +22,13 @@ HEADERS = {
     "(KHTML, like Gecko) Chrome/126.0 Safari/537.36",
     "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.7",
 }
+BAD_RESULT_RE = re.compile(
+    r"表情包|表情图|斗图|梗图|沙雕|熊猫头|猫猫表情|狗狗表情|微信表情|搞笑|恶搞|"
+    r"头像|壁纸|商品|购买|价格|包邮|淘宝|京东|拼多多|旗舰店|ppt|课件|教案|试卷|"
+    r"免抠|png素材|素材png|透明底|模板|海报|字体|语录|文案|带字|台词截图|截图|"
+    r"wallpaper|meme|emoji|emoticon|sticker|signed|autograph|certified|price|buy",
+    re.IGNORECASE,
+)
 
 
 def fetch(url, referer=None, timeout=10):
@@ -47,6 +54,12 @@ def valid_url(value):
 def safe_filename(value):
     value = re.sub(r"[^\w\u4e00-\u9fff-]+", "_", str(value or ""), flags=re.UNICODE).strip("_")
     return value[:32] or "image"
+
+
+def is_bad_result(item):
+    title = item.get("title", "")
+    plain = re.sub(r"[\W_]+", "", title, flags=re.UNICODE)
+    return bool(BAD_RESULT_RE.search(title) or len(plain) < 2 or plain.isdigit())
 
 
 def extension_for(url, content_type):
@@ -143,8 +156,12 @@ def bing_images(query, page, count):
 
 
 def search_all(query, page, count):
+    source_count = min(max(count * 3, count), 40)
     with ThreadPoolExecutor(max_workers=2) as pool:
-        futures = [pool.submit(baidu_images, query, page, count), pool.submit(bing_images, query, page, count)]
+        futures = [
+            pool.submit(baidu_images, query, page, source_count),
+            pool.submit(bing_images, query, page, source_count),
+        ]
         items = []
         for future in futures:
             try:
@@ -160,7 +177,9 @@ def search_all(query, page, count):
             continue
         seen.add(key)
         unique.append(item)
-    return unique[: count * 2]
+
+    preferred = [item for item in unique if not is_bad_result(item)]
+    return (preferred or unique)[:count]
 
 
 def download_export_item(payload):
@@ -171,9 +190,11 @@ def download_export_item(payload):
             continue
         try:
             raw, content_type = fetch_binary(url, referer=item.get("page"))
+            slot = item.get("slot")
+            slot_part = f"_{safe_filename(slot)}" if slot not in (None, "") else ""
             name = "{:03d}_{}_{}{}".format(
                 index,
-                safe_filename(item.get("taskId") or item.get("query")),
+                safe_filename(item.get("taskId") or item.get("query")) + slot_part,
                 safe_filename(item.get("query")),
                 extension_for(url, content_type),
             )
@@ -191,7 +212,7 @@ def make_export_zip(items):
 
     csv_buffer = io.StringIO()
     writer = csv.writer(csv_buffer)
-    writer.writerow(["序号", "文件名", "段落编号", "搜索词", "标题", "来源", "来源页面", "对应段落"])
+    writer.writerow(["序号", "文件名", "段落编号", "段内序号", "搜索词", "标题", "来源", "来源页面", "对应段落"])
 
     memory = io.BytesIO()
     with zipfile.ZipFile(memory, "w", compression=zipfile.ZIP_DEFLATED) as archive:
@@ -208,6 +229,7 @@ def make_export_zip(items):
                     f"{index:03d}",
                     filename,
                     item.get("taskId", ""),
+                    item.get("slot", ""),
                     item.get("query", ""),
                     item.get("title", ""),
                     item.get("source", ""),
@@ -245,7 +267,7 @@ class Handler(SimpleHTTPRequestHandler):
         params = urllib.parse.parse_qs(parsed.query)
         query = (params.get("q") or [""])[0].strip()
         page = int((params.get("page") or ["0"])[0] or 0)
-        count = min(max(int((params.get("count") or ["40"])[0] or 40), 10), 60)
+        count = min(max(int((params.get("count") or ["8"])[0] or 8), 1), 30)
         if not query:
             self.write_json({"items": []})
             return
