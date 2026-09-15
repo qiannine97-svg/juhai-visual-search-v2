@@ -1,0 +1,16 @@
+公网测试版部署说明：
+
+推荐用 Railway。
+
+1. 新建一个 GitHub 仓库。
+2. 把这个文件夹里的所有文件上传到仓库。
+3. 打开 Railway，选择 New Project。
+4. 选择 Deploy from GitHub repo。
+5. 选中刚才上传的仓库。
+6. Railway 会自动执行 Procfile：python server.py。
+7. 部署完成后，在 Railway 里生成 Public Networking 域名。
+8. 把生成的网址发给朋友测试。
+
+后续修改：
+
+改完文件后重新上传或提交到 GitHub，Railway 会自动重新部署。

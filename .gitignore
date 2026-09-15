@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.log
+server-url.txt
+public-url.txt
+public-pids.txt
+.venv/

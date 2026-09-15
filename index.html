@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>聚海画面素材搜索器v2</title>
+    <link rel="icon" href="./logo.jpg" />
+    <link rel="stylesheet" href="./styles.css?v=1" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <img class="brand-logo" src="./logo.jpg" alt="聚海云科" />
+        <div>
+          <p class="eyebrow">聚海云科旗下</p>
+          <h1>聚海画面素材搜索器v2</h1>
+        </div>
+      </div>
+      <button class="button button-light" id="demoButton">载入完整示例</button>
+    </header>
+
+    <main class="layout">
+      <section class="panel input-panel">
+        <div class="panel-title">
+          <h2>输入文字</h2>
+          <span id="charCount">0 字</span>
+        </div>
+        <textarea id="textInput" placeholder="粘贴长文案。系统会按段落生成搜索词，每段至少保底一个。"></textarea>
+        <div class="actions">
+          <button class="button button-primary" id="buildButton">生成搜索任务</button>
+          <button class="button button-light" id="clearButton">清空</button>
+        </div>
+      </section>
+
+      <section class="panel keyword-panel">
+        <div class="panel-title">
+          <h2>搜索任务</h2>
+          <span id="taskCount">0 段</span>
+        </div>
+        <div class="add-keyword">
+          <input id="manualInput" type="text" placeholder="手动添加搜索词，例如：98版水浒片尾长卷" />
+          <button class="button button-light" id="manualButton">添加</button>
+        </div>
+        <div class="task-tags" id="taskTags"></div>
+      </section>
+
+      <section class="panel results-panel">
+        <div class="panel-title result-title">
+          <h2>图片结果</h2>
+          <div class="result-tools">
+            <div class="ratio-control" aria-label="图片比例">
+              <button class="is-active" data-ratio="9 / 16">9:16</button>
+              <button data-ratio="16 / 9">16:9</button>
+              <button data-ratio="1 / 1">1:1</button>
+            </div>
+            <span id="imageCount">等待生成</span>
+          </div>
+        </div>
+        <div class="empty" id="emptyResults">生成搜索任务后，展开某一段即可看图。</div>
+        <div class="result-list" id="resultList"></div>
+      </section>
+
+      <aside class="panel basket-panel">
+        <div class="panel-title">
+          <h2>已添加</h2>
+          <span id="basketCount">0 张</span>
+        </div>
+        <div class="empty" id="emptyBasket">点击图片上的“添加”，素材会放到这里。</div>
+        <div class="basket-list" id="basketList"></div>
+        <button class="button button-primary button-wide" id="exportButton">导出素材清单</button>
+      </aside>
+    </main>
+
+    <div class="toast" id="toast" role="status"></div>
+    <script src="./app.js?v=2"></script>
+  </body>
+</html>
