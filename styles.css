@@ -202,6 +202,11 @@ input:focus {
   color: var(--ink);
 }
 
+.button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
 .button-wide {
   width: 100%;
   margin-top: 14px;

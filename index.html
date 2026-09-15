@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>聚海画面素材搜索器v2</title>
     <link rel="icon" href="./logo.jpg" />
-    <link rel="stylesheet" href="./styles.css?v=1" />
+    <link rel="stylesheet" href="./styles.css?v=2" />
   </head>
   <body>
     <header class="topbar">
@@ -67,11 +67,12 @@
         </div>
         <div class="empty" id="emptyBasket">点击图片上的“添加”，素材会放到这里。</div>
         <div class="basket-list" id="basketList"></div>
-        <button class="button button-primary button-wide" id="exportButton">导出素材清单</button>
+        <button class="button button-light button-wide" id="autoPickButton">按顺序选每段首图</button>
+        <button class="button button-primary button-wide" id="exportButton">导出剪映图片ZIP</button>
       </aside>
     </main>
 
     <div class="toast" id="toast" role="status"></div>
-    <script src="./app.js?v=2"></script>
+    <script src="./app.js?v=3"></script>
   </body>
 </html>

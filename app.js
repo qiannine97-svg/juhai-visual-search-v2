@@ -474,6 +474,7 @@ const phraseOrder = Object.keys(phraseQueries).sort((a, b) => b.length - a.lengt
 const state = {
   tasks: [],
   basket: [],
+  pickSeq: 0,
   ratio: "9 / 16",
 };
 
@@ -494,6 +495,7 @@ const els = {
   basketCount: $("#basketCount"),
   emptyBasket: $("#emptyBasket"),
   basketList: $("#basketList"),
+  autoPickButton: $("#autoPickButton"),
   exportButton: $("#exportButton"),
   ratioButtons: document.querySelectorAll("[data-ratio]"),
   toast: $("#toast"),
@@ -579,6 +581,7 @@ function buildTasks(text) {
     lastQuery = queries[0] || lastQuery;
     return {
       id: `S${String(index + 1).padStart(2, "0")}`,
+      order: index + 1,
       segment,
       terms,
       queries,
@@ -744,6 +747,7 @@ function addManualTask() {
   els.manualInput.value = "";
   const task = {
     id: `M${String(state.tasks.filter((item) => item.id.startsWith("M")).length + 1).padStart(2, "0")}`,
+    order: state.tasks.length + 1,
     segment: "手动添加",
     terms: [query],
     queries: [query],
@@ -760,9 +764,9 @@ function addManualTask() {
 }
 
 function findItem(id) {
-  for (const task of state.tasks) {
+  for (const [index, task] of state.tasks.entries()) {
     const item = task.items.find((candidate) => candidate.id === id);
-    if (item) return { ...item, query: task.query, segment: task.segment };
+    if (item) return { ...item, taskId: task.id, order: task.order || index + 1, query: task.query, segment: task.segment };
   }
   return null;
 }
@@ -770,21 +774,43 @@ function findItem(id) {
 function addToBasket(id) {
   const item = findItem(id);
   if (!item || state.basket.some((saved) => saved.id === id)) return;
-  state.basket.push(item);
+  state.basket.push({ ...item, selectedAt: ++state.pickSeq });
   renderBasket();
   showToast("已添加到素材篮。");
+}
+
+function orderedBasketItems() {
+  return [...state.basket].sort((a, b) => (a.order - b.order) || (a.selectedAt - b.selectedAt));
+}
+
+function autoPickFirstImages() {
+  let added = 0;
+  state.tasks.forEach((task, index) => {
+    if (!task.items.length || state.basket.some((item) => item.taskId === task.id)) return;
+    state.basket.push({
+      ...task.items[0],
+      taskId: task.id,
+      order: task.order || index + 1,
+      query: task.query,
+      segment: task.segment,
+      selectedAt: ++state.pickSeq,
+    });
+    added += 1;
+  });
+  renderBasket();
+  showToast(added ? `已按顺序添加 ${added} 张首图。` : "没有可添加的新图片。");
 }
 
 function renderBasket() {
   els.emptyBasket.hidden = state.basket.length > 0;
   els.basketCount.textContent = `${state.basket.length} 张`;
-  els.basketList.innerHTML = state.basket
+  els.basketList.innerHTML = orderedBasketItems()
     .map(
-      (item) => `
+      (item, index) => `
         <article class="basket-item">
           <img src="${item.thumb}" alt="${escapeHtml(item.title)}" referrerpolicy="no-referrer" />
           <div class="basket-copy">
-            <strong>${escapeHtml(item.title || "图片结果")}</strong>
+            <strong>${String(index + 1).padStart(3, "0")} ${escapeHtml(item.taskId || "")} ${escapeHtml(item.title || "图片结果")}</strong>
             <span>${escapeHtml(item.query)} · ${escapeHtml(item.source)}</span>
             <button class="remove-button" data-delete="${escapeHtml(item.id)}">移除</button>
           </div>
@@ -799,23 +825,35 @@ function updateImageCount() {
   els.imageCount.textContent = state.tasks.length ? `${count} 张图片` : "等待生成";
 }
 
-function exportBasket() {
-  if (!state.basket.length) {
-    showToast("素材篮还是空的。");
+async function exportBasket() {
+  if (!state.basket.length) autoPickFirstImages();
+  const items = orderedBasketItems();
+  if (!items.length) {
+    showToast("先生成并搜到图片，再导出。");
     return;
   }
-  const rows = [
-    ["搜索词", "标题", "来源", "来源页面", "图片地址", "对应段落"],
-    ...state.basket.map((item) => [item.query, item.title, item.source, item.page, item.image, item.segment]),
-  ];
-  const csv = rows.map((row) => row.map((cell) => `"${String(cell || "").replace(/"/g, '""')}"`).join(",")).join("\n");
-  const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "素材清单-v2.csv";
-  link.click();
-  URL.revokeObjectURL(url);
+  els.exportButton.disabled = true;
+  showToast(`正在按顺序打包 ${items.length} 张图片...`);
+  try {
+    const response = await fetch("/api/export", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items }),
+    });
+    if (!response.ok) throw new Error("导出失败");
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "聚海剪映导入图片.zip";
+    link.click();
+    URL.revokeObjectURL(url);
+    showToast("已导出，解压后按文件名顺序导入剪映。");
+  } catch {
+    showToast("导出失败，可以少选几张后再试。");
+  } finally {
+    els.exportButton.disabled = false;
+  }
 }
 
 function clearAll() {
@@ -823,6 +861,7 @@ function clearAll() {
   els.charCount.textContent = "0 字";
   state.tasks = [];
   state.basket = [];
+  state.pickSeq = 0;
   renderAll();
 }
 
@@ -878,6 +917,7 @@ els.basketList.addEventListener("click", (event) => {
   state.basket = state.basket.filter((item) => item.id !== id);
   renderBasket();
 });
+els.autoPickButton.addEventListener("click", autoPickFirstImages);
 els.exportButton.addEventListener("click", exportBasket);
 els.ratioButtons.forEach((button) => {
   button.addEventListener("click", () => setRatio(button.dataset.ratio));
