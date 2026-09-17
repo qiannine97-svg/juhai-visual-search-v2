@@ -94,13 +94,14 @@ h2 {
 .layout {
   display: grid;
   grid-template-columns: minmax(270px, 360px) minmax(0, 1fr) minmax(270px, 330px);
-  grid-template-areas:
-    "input results basket"
-    "tasks results basket";
+  grid-template-areas: "side results basket";
   gap: 18px;
+  height: calc(100vh - 104px);
+  min-height: 620px;
+  overflow: hidden;
   padding-top: 12px;
   padding-bottom: 36px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .panel {
@@ -111,23 +112,29 @@ h2 {
   padding: 18px;
 }
 
-.input-panel {
-  grid-area: input;
-}
-
-.keyword-panel {
-  grid-area: tasks;
+.side-stack {
+  display: grid;
+  grid-area: side;
+  align-content: start;
+  gap: 18px;
+  min-height: 0;
+  overflow: auto;
 }
 
 .results-panel {
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
   grid-area: results;
-  min-height: 760px;
+  min-height: 0;
 }
 
 .basket-panel {
-  position: sticky;
-  top: 16px;
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
   grid-area: basket;
+  min-height: 0;
 }
 
 .panel-title {
@@ -212,6 +219,13 @@ input:focus {
   margin-top: 14px;
 }
 
+.button-small {
+  min-height: 32px;
+  border-radius: 9px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
 .task-tags {
   display: flex;
   flex-wrap: wrap;
@@ -281,7 +295,11 @@ input:focus {
 
 .result-list {
   display: grid;
+  flex: 1;
   gap: 0;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 6px;
 }
 
 .task-row {
@@ -299,6 +317,15 @@ input:focus {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 14px;
   align-items: center;
+}
+
+.task-row.is-expanded .row-head {
+  position: sticky;
+  z-index: 4;
+  top: 0;
+  margin-top: -8px;
+  padding: 8px 0;
+  background: var(--panel);
 }
 
 .row-toggle {
@@ -395,6 +422,17 @@ input:focus {
   padding-left: 34px;
 }
 
+.body-toolbar {
+  position: sticky;
+  z-index: 3;
+  top: 44px;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  background: linear-gradient(var(--panel) 70%, rgba(255, 255, 255, 0));
+}
+
 .notice {
   border: 1px solid #f0d8d2;
   border-radius: 10px;
@@ -468,8 +506,9 @@ input:focus {
 
 .basket-list {
   display: grid;
+  flex: 1;
   gap: 10px;
-  max-height: 640px;
+  min-height: 0;
   overflow: auto;
 }
 
@@ -547,12 +586,37 @@ input:focus {
   .layout {
     grid-template-columns: minmax(270px, 360px) minmax(0, 1fr);
     grid-template-areas:
-      "input results"
-      "tasks results"
+      "side results"
       "basket basket";
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    align-items: start;
+  }
+
+  .side-stack,
+  .result-list {
+    overflow: visible;
+  }
+
+  .results-panel {
+    display: block;
+    overflow: visible;
+    min-height: 760px;
   }
 
   .basket-panel {
+    display: block;
+    overflow: visible;
+    min-height: 0;
+  }
+
+  .basket-list {
+    max-height: 640px;
+  }
+
+  .task-row.is-expanded .row-head,
+  .body-toolbar {
     position: static;
   }
 }
@@ -572,8 +636,7 @@ input:focus {
   .layout {
     grid-template-columns: 1fr;
     grid-template-areas:
-      "input"
-      "tasks"
+      "side"
       "results"
       "basket";
   }

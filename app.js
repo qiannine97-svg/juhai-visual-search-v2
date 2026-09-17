@@ -490,6 +490,7 @@ const els = {
   taskCount: $("#taskCount"),
   taskTags: $("#taskTags"),
   imageCount: $("#imageCount"),
+  collapseAllButton: $("#collapseAllButton"),
   emptyResults: $("#emptyResults"),
   resultList: $("#resultList"),
   basketCount: $("#basketCount"),
@@ -657,7 +658,7 @@ function renderResults() {
       const bing = `https://www.bing.com/images/search?q=${encodeURIComponent(task.query)}`;
       const douyin = `https://www.douyin.com/search/${encodeURIComponent(task.query)}`;
       return `
-        <section class="task-row" data-index="${index}">
+        <section class="task-row ${task.expanded ? "is-expanded" : ""}" data-index="${index}">
           <div class="row-head">
             <button class="row-toggle" data-toggle="${index}" aria-expanded="${task.expanded}">
               <span class="arrow">${task.expanded ? "⌄" : "›"}</span>
@@ -699,6 +700,9 @@ function renderTaskBody(task, index) {
 
   return `
     <div class="result-body">
+      <div class="body-toolbar">
+        <button class="button button-light button-small" data-collapse="${index}">收起本段</button>
+      </div>
       <div class="image-grid">
         ${task.items.map((item, itemIndex) => renderImageCard(item, index, itemIndex)).join("")}
       </div>
@@ -727,6 +731,20 @@ function toggleTask(index) {
   const task = state.tasks[index];
   if (!task) return;
   task.expanded = !task.expanded;
+  renderResults();
+}
+
+function collapseTask(index) {
+  const task = state.tasks[index];
+  if (!task) return;
+  task.expanded = false;
+  renderResults();
+}
+
+function collapseAllTasks() {
+  state.tasks.forEach((task) => {
+    task.expanded = false;
+  });
   renderResults();
 }
 
@@ -923,11 +941,13 @@ els.manualInput.addEventListener("keydown", (event) => {
 els.resultList.addEventListener("click", (event) => {
   const toggleIndex = event.target.closest("[data-toggle]")?.dataset.toggle;
   const addButton = event.target.closest("[data-add-task][data-add-item]");
+  const collapseIndex = event.target.closest("[data-collapse]")?.dataset.collapse;
   const moreIndex = event.target.dataset.more;
   const queryIndex = event.target.dataset.queryIndex;
 
   if (toggleIndex !== undefined) toggleTask(Number(toggleIndex));
   if (queryIndex !== undefined) setTaskQuery(Number(queryIndex), event.target.dataset.query);
+  if (collapseIndex !== undefined) collapseTask(Number(collapseIndex));
   if (addButton) addToBasket(Number(addButton.dataset.addTask), Number(addButton.dataset.addItem));
   if (moreIndex !== undefined) searchTask(state.tasks[Number(moreIndex)], true);
 });
@@ -939,6 +959,7 @@ els.basketList.addEventListener("click", (event) => {
 });
 els.autoPickButton.addEventListener("click", autoPickFirstImages);
 els.exportButton.addEventListener("click", exportBasket);
+els.collapseAllButton.addEventListener("click", collapseAllTasks);
 els.ratioButtons.forEach((button) => {
   button.addEventListener("click", () => setRatio(button.dataset.ratio));
 });

@@ -4,7 +4,7 @@ const vm = require("vm");
 const assert = require("assert");
 
 const appPath = path.join(__dirname, "app.js");
-const appCode = `${fs.readFileSync(appPath, "utf8")}\nthis.__buildTasks = buildTasks; this.__state = state; this.__addToBasket = addToBasket; this.__orderedBasketItems = orderedBasketItems;`;
+const appCode = `${fs.readFileSync(appPath, "utf8")}\nthis.__buildTasks = buildTasks; this.__state = state; this.__addToBasket = addToBasket; this.__orderedBasketItems = orderedBasketItems; this.__collapseTask = collapseTask; this.__collapseAllTasks = collapseAllTasks;`;
 
 const fakeElement = {
   value: "",
@@ -105,6 +105,7 @@ context.__state.tasks = [
     order: 1,
     segment: "第一段",
     query: "测试",
+    expanded: true,
     items: [
       { id: "same-id", title: "第一张", source: "测试", thumb: "https://example.com/1-thumb.jpg", image: "https://example.com/1.jpg" },
       { id: "same-id", title: "第二张", source: "测试", thumb: "https://example.com/2-thumb.jpg", image: "https://example.com/2.jpg" },
@@ -123,5 +124,11 @@ assert.deepStrictEqual(
   ["S01-1", "S01-2"],
   "素材篮应保留段内选择顺序",
 );
+
+context.__collapseTask(0);
+assert.strictEqual(context.__state.tasks[0].expanded, false, "收起本段应该关闭当前段落");
+context.__state.tasks.push({ id: "S02", order: 2, segment: "第二段", query: "测试二", expanded: true, items: [] });
+context.__collapseAllTasks();
+assert(context.__state.tasks.every((task) => task.expanded === false), "全部收起应该关闭所有段落");
 
 console.log(`关键词自检通过：${tasks.length} 行，${new Set(queries).size} 个首选搜索词。`);

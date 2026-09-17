@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>聚海画面素材搜索器v2</title>
     <link rel="icon" href="./logo.jpg" />
-    <link rel="stylesheet" href="./styles.css?v=2" />
+    <link rel="stylesheet" href="./styles.css?v=4" />
   </head>
   <body>
     <header class="topbar">
@@ -20,29 +20,31 @@
     </header>
 
     <main class="layout">
-      <section class="panel input-panel">
-        <div class="panel-title">
-          <h2>输入文字</h2>
-          <span id="charCount">0 字</span>
-        </div>
-        <textarea id="textInput" placeholder="粘贴长文案。系统会按段落生成搜索词，每段至少保底一个。"></textarea>
-        <div class="actions">
-          <button class="button button-primary" id="buildButton">生成搜索任务</button>
-          <button class="button button-light" id="clearButton">清空</button>
-        </div>
-      </section>
+      <div class="side-stack">
+        <section class="panel input-panel">
+          <div class="panel-title">
+            <h2>输入文字</h2>
+            <span id="charCount">0 字</span>
+          </div>
+          <textarea id="textInput" placeholder="粘贴长文案。系统会按段落生成搜索词，每段至少保底一个。"></textarea>
+          <div class="actions">
+            <button class="button button-primary" id="buildButton">生成搜索任务</button>
+            <button class="button button-light" id="clearButton">清空</button>
+          </div>
+        </section>
 
-      <section class="panel keyword-panel">
-        <div class="panel-title">
-          <h2>搜索任务</h2>
-          <span id="taskCount">0 段</span>
-        </div>
-        <div class="add-keyword">
-          <input id="manualInput" type="text" placeholder="手动添加搜索词，例如：98版水浒片尾长卷" />
-          <button class="button button-light" id="manualButton">添加</button>
-        </div>
-        <div class="task-tags" id="taskTags"></div>
-      </section>
+        <section class="panel keyword-panel">
+          <div class="panel-title">
+            <h2>搜索任务</h2>
+            <span id="taskCount">0 段</span>
+          </div>
+          <div class="add-keyword">
+            <input id="manualInput" type="text" placeholder="手动添加搜索词，例如：98版水浒片尾长卷" />
+            <button class="button button-light" id="manualButton">添加</button>
+          </div>
+          <div class="task-tags" id="taskTags"></div>
+        </section>
+      </div>
 
       <section class="panel results-panel">
         <div class="panel-title result-title">
@@ -54,6 +56,7 @@
               <button data-ratio="1 / 1">1:1</button>
             </div>
             <span id="imageCount">等待生成</span>
+            <button class="button button-light button-small" id="collapseAllButton">全部收起</button>
           </div>
         </div>
         <div class="empty" id="emptyResults">生成搜索任务后，展开某一段即可看图。</div>
@@ -73,6 +76,6 @@
     </main>
 
     <div class="toast" id="toast" role="status"></div>
-    <script src="./app.js?v=3"></script>
+    <script src="./app.js?v=4"></script>
   </body>
 </html>
